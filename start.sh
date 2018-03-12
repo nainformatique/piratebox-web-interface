@@ -1,8 +1,6 @@
 #!/bin/bash
 
 location=`dirname $0`
-upload_dir=/uploads
-upload_dir_link=$location/uploads
 
 webroot=$location
 web_user=www-data
@@ -68,9 +66,5 @@ http {
 EOF
 echo "$nginx_conf" > $nginx_conf_file
 
-mkdir -p $upload_dir
-chown -R $web_user:$web_user $upload_dir
-unlink $upload_dir_link
-ln -fns $upload_dir $upload_dir_link
 chown -R $web_user:$web_user .
 run nginx -c $nginx_conf_file
