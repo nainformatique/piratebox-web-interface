@@ -4,7 +4,7 @@ location=`dirname $0`
 upload_dir=/uploads
 upload_dir_link=$location/uploads
 
-webroot=$location/webroot
+webroot=$location
 web_user=www-data
 nginx_conf_file=$location/nginx.conf
 
@@ -19,8 +19,8 @@ if [ $UID != 0 ] ; then
   die "You must be root"
 fi
 
-apt install -y clamav-daemon nginx php7.0-fpm
-
+#apt install -y clamav-daemon nginx php7.0-fpm
+#xxx change the max file and post sizes in php.ini
 systemctl start php7.0-fpm
 systemctl stop nginx
 systemctl disable nginx
@@ -47,17 +47,18 @@ http {
   gzip on;
   gzip_disable "msie6";
   include /etc/nginx/conf.d/*.conf;
-  
   server {
     listen 80;
     server_name _;
     root $webroot;
+    charset utf-8;
     
     location / {
       index index.php;
       try_files \$uri \$uri/ =404;
     }
-    location ~ \.php$ {
+    # XXX il faut que le php ne soit pas exécuté s’il vient de /uploads
+    location ~ index\.php$ {
       fastcgi_pass unix:/run/php/php7.0-fpm.sock;
       fastcgi_index index.php;
       include /etc/nginx/fastcgi.conf;
@@ -68,6 +69,8 @@ EOF
 echo "$nginx_conf" > $nginx_conf_file
 
 mkdir -p $upload_dir
+chown -R $web_user:$web_user $upload_dir
+unlink $upload_dir_link
 ln -fns $upload_dir $upload_dir_link
 chown -R $web_user:$web_user .
 run nginx -c $nginx_conf_file

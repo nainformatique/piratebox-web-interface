@@ -3,7 +3,7 @@ $error = [ 'message' => '', 'type' => 'success' ];
 
 /* Upload form reception */
 if(isset($_FILES['file'])){
-	$name = htmlentities(str_replace(['<', '>', ' '], ['', '', '_'], "upload/".$_FILES['file']['name']));
+	$name = htmlentities(str_replace(['<', '>', ' '], ['', '', '_'], "uploads/".$_FILES['file']['name']));
 	if ($_FILES['file']['error'] == UPLOAD_ERR_NO_FILE) $error = [ 'message' => 'fichier manquant', 'type' => 'success' ];
 	else if ($_FILES['file']['error'] == UPLOAD_ERR_INI_SIZE) $error = [ 'message' => 'fichier dépassant la taille maximale autorisée par PHP', 'type' => 'success' ];
 	else if ($_FILES['file']['error'] == UPLOAD_ERR_FORM_SIZE) $error = [ 'message' => 'fichier dépassant la taille maximale autorisée par le formulaire', 'type' => 'success' ];
@@ -13,7 +13,10 @@ if(isset($_FILES['file'])){
     //https://help.ubuntu.com/community/Antivirus
     
     $error = [ 'message' => 'Transfert réussit', 'type' => 'success' ];
-	}
+  }else{
+    $error = [ 'message' => 'Le fichier n’a pas pu être copié ! Contactez le webmaster.', 'type' => 'danger' ];
+  }
+
 }
 ?>
 
@@ -34,12 +37,14 @@ if(isset($_FILES['file'])){
 			</form>
 		</div>
 	</header>
-	<main>
+  <main>
+    <ul>
     <?php
-      foreach (array_slice(scandir('/path/to/directory/'), 2) as $file){
-        echo '<a href="',$file,'">',$file,'</a>';
+      foreach (array_slice(scandir('uploads'), 2) as $file){
+        echo '<li><a href="uploads/',$file,'">',$file,'</a></li>';
       }
     ?>
+    </ul>
 	</main>
 </body>
 </html>
